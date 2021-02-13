@@ -1,9 +1,15 @@
 import React from "react";
 
 import "./menu-item.styles.scss";
+import { withRouter } from "react-router-dom";
 
-const MenuItem = ({ title, imageUrl, size }) => (
-  <div className={`${size} menu-item`}>
+//in the props, title, imageUrl, size and linkUrl are from this.state in the Directory component
+//but the history and match prop is from the HomePage component that is passed directly using withRouter()
+const MenuItem = ({ title, imageUrl, size, linkUrl, history, match }) => (
+  <div
+    className={`${size} menu-item`}
+    onClick={() => history.push(`${match.url}${linkUrl}`)}
+  >
     <div
       className="background-image"
       style={{ backgroundImage: `url(${imageUrl})` }}
@@ -15,4 +21,4 @@ const MenuItem = ({ title, imageUrl, size }) => (
   </div>
 );
 
-export default MenuItem;
+export default withRouter(MenuItem);
