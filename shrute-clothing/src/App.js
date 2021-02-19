@@ -9,6 +9,9 @@ import SignInAndSignUpPage from "./pages/sign-in-and-sign-up/sign-in-and-sign-up
 
 import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
 
+import { connect } from "react-redux";
+import { setCurrentUser } from "./redux/user/user.actions";
+
 // const HatsPage = () => (
 //   <div>
 //     <h1>Hats Page</h1>
@@ -16,13 +19,14 @@ import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
 // );
 
 class App extends React.Component {
-  constructor() {
-    super();
+  // constructor() {
+  //   super();
 
-    this.state = {
-      currentUser: null,
-    };
-  }
+  //   this.state = {
+  //     currentUser: null,
+  //   };
+  // }
+  // removed constructor cuz using redux now
 
   unsubscribeFromAuth = null;
 
@@ -36,23 +40,38 @@ class App extends React.Component {
     //   createUserProfileDocument(user); //Creates a user in the db after creating a snapshot if the user doesn't exist in the firestore db
     // });
 
+    // removed cuz using redux
+    //   this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
+    //     if (userAuth) {
+    //       const userRef = await createUserProfileDocument(userAuth);
+    //       userRef.onSnapshot((snapShot) => {
+    //         this.setState({
+    //           currentUser: {
+    //             id: snapShot.id,
+    //             ...snapShot.data(),
+    //           }
+    //         })
+    //       });
+    //       // console.log(this.state);
+    //     }
+    //     this.setState({ currentUser: userAuth }); //sets either the valid user or null depending on the auth status
+    //   });
+    // }
+
+    const { setCurrentUser } = this.props;
+
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
       if (userAuth) {
         const userRef = await createUserProfileDocument(userAuth);
 
         userRef.onSnapshot((snapShot) => {
-          this.setState({
-            currentUser: {
-              id: snapShot.id,
-              ...snapShot.data(),
-            },
+          setCurrentUser({
+            id: snapShot.id,
+            ...snapShot.data(),
           });
-
-          // console.log(this.state);
         });
       }
-
-      this.setState({ currentUser: userAuth }); //sets either the valid user or null depending on the auth status
+      setCurrentUser(userAuth);
     });
   }
 
@@ -63,7 +82,9 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <Header currentUser={this.state.currentUser} />
+        {/* <Header currentUser={this.state.currentUser} /> */}
+        <Header />
+        {/* removed passing currentUser from here and passing it instead from redux */}
         <Switch>
           <Route exact path="/" component={HomePage} />
           {/* <Route path="/shop/hats" component={HatsPage} /> */}
@@ -75,4 +96,9 @@ class App extends React.Component {
   }
 }
 
-export default App;
+// returns a dispatch object that dispatches whatever prop we pass in (which here is SET_CURRENT_USER)
+const mapDispatchToProps = (dispatch) => ({
+  setCurrentUser: (user) => dispatch(setCurrentUser(user)), // dispatch lets redux reducer know that whatever is being passed is an action object (action.type and action.payload waalo)
+});
+
+export default connect(null, mapDispatchToProps)(App);
