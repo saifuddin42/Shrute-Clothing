@@ -1,6 +1,6 @@
 import React from "react";
 
-import "./custom-buttom.styles.scss";
+import "./custom-button.styles.scss";
 
 const CustomButton = ({ children, isGoogleSignIn, ...otherProps }) => (
   <button
@@ -10,5 +10,6 @@ const CustomButton = ({ children, isGoogleSignIn, ...otherProps }) => (
     {children}
   </button>
 );
+// Don't know why but {...otherProps} is required for google sign in window to pop up
 
 export default CustomButton;
