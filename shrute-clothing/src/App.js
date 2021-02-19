@@ -2,7 +2,7 @@ import React from "react";
 import "./App.css";
 
 import HomePage from "./pages/homepage/homepage.component";
-import { Switch, Route, Link } from "react-router-dom";
+import { Switch, Route, Redirect, Link } from "react-router-dom";
 import ShopPage from "./pages/shop/shop.component";
 import Header from "./components/header/header.component";
 import SignInAndSignUpPage from "./pages/sign-in-and-sign-up/sign-in-and-sign-up.component";
@@ -89,16 +89,32 @@ class App extends React.Component {
           <Route exact path="/" component={HomePage} />
           {/* <Route path="/shop/hats" component={HatsPage} /> */}
           <Route path="/shop" component={ShopPage} />
-          <Route path="/signin" component={SignInAndSignUpPage} />
+          {/* Redirects users to homepage if someone is signed in so that once 
+          signed in they can't sign in again without signing out and if the currentUser is null then go to the signin page  */}
+          <Route
+            exact
+            path="/signin"
+            render={() =>
+              this.props.currentUser ? (
+                <Redirect to="/" />
+              ) : (
+                <SignInAndSignUpPage />
+              )
+            }
+          />
         </Switch>
       </div>
     );
   }
 }
 
+const mapStateToProps = ({ user }) => ({
+  currentUser: user.currentUser,
+});
+
 // returns a dispatch object that dispatches whatever prop we pass in (which here is SET_CURRENT_USER)
 const mapDispatchToProps = (dispatch) => ({
   setCurrentUser: (user) => dispatch(setCurrentUser(user)), // dispatch lets redux reducer know that whatever is being passed is an action object (action.type and action.payload waalo)
 });
 
-export default connect(null, mapDispatchToProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App);
